@@ -1,20 +1,33 @@
 ---
 title: typst engine demo
+format: typst
 engine: typst
 ---
 
 == Typst with quarto code blocks
 
-#columns([
+Here is a grid with mermaid (@fig-mermaid)  and graphviz (@fig-graphviz) code blocks:
+
+#grid(columns: 2, [
+
 ```{mermaid}
+%%| label: fig-mermaid
+%%| fig-cap: mermaid
+%%| fig-width: 3
 flowchart LR
   A[Hard edge] --> B(Round edge)
   B --> C{Decision}
   C --> D[Result one]
   C --> E[Result two]
 ```
+
 ], [
+
 ```{dot}
+//| label: fig-graphviz
+//| fig-cap: graphviz
+//| fig-width: 3
+//| fig-height: 1.75
 graph G {
   layout=neato
   run -- intr;
@@ -32,4 +45,5 @@ graph G {
   sleep -- runmem;
 }
 ```
+
 ])

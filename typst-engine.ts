@@ -135,6 +135,38 @@ function chunkQuartoMarkdown(markdown: string): QuartoChunk[] {
   return chunks;
 }
 
+/**
+ * Converts an array of Quarto chunks back into a Quarto markdown string.
+ * Markdown chunks are wrapped in ```{=typst} ... ``` delimiters.
+ *
+ * @param chunks Array of Quarto chunks to convert
+ * @returns The combined Quarto markdown string
+ */
+function quartoChunksToMarkdown(chunks: QuartoChunk[]): string {
+  let result = '';
+
+  for (const chunk of chunks) {
+    switch (chunk.type) {
+      case 'metadata':
+        // Metadata is wrapped in triple dashes
+        result += `---\n${chunk.content}\n---\n\n`;
+        break;
+
+      case 'markdown':
+        // Markdown chunks are wrapped in ```{=typst} ... ``` delimiters
+        result += `\`\`\`{=typst}\n${chunk.content}\n\`\`\`\n\n`;
+        break;
+
+      case 'code':
+        // Code blocks are wrapped in triple backticks with language spec
+        result += `\`\`\`{${chunk.language}}\n${chunk.content}\n\`\`\`\n\n`;
+        break;
+    }
+  }
+
+  return result;
+}
+
 
 
 const typstEngine: ExecutionEngine = {
@@ -178,7 +210,7 @@ const typstEngine: ExecutionEngine = {
 
   execute: (options: ExecuteOptions) => {
     // read markdown
-    const markdown = options.target.markdown.value;
+    let markdown = options.target.markdown.value;
 
     // Parse the markdown into chunks
     const chunks = chunkQuartoMarkdown(markdown);
@@ -194,6 +226,8 @@ const typstEngine: ExecutionEngine = {
         );
       }
     }
+
+    markdown = quartoChunksToMarkdown(chunks);
 
     return Promise.resolve({
       engine: "typst",
