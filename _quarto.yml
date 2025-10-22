@@ -1,2 +1,2 @@
 engines:
-  - url: "../../../quarto-typst-engine/typst-engine.ts"
+  - url: file:///Users/gordon/src/quarto-typst-engine/typst-engine.ts
