@@ -9,11 +9,12 @@ This engine is an experiment in using Typst as the main markdown language in a Q
 1. Chunking your document into metadata, markdown, and code blocks
 2. Wrapping regular markdown content in `{=typst}` raw blocks:
 
-```
+````
 ```{=typst}
 Your regular markdown content
-```
-```
+````
+
+````
 
 3. Preserving code blocks (like `{mermaid}` or `{dot}`) to be processed by their respective engines
 
@@ -37,7 +38,7 @@ This engine requires Quarto 1.9 (currently in development) with support for exte
 cd ../quarto-cli/packages/quarto-types
 npm install
 npm run build
-```
+````
 
 2. In your Quarto project, add the following to `_quarto.yml`:
 
@@ -46,7 +47,7 @@ engines:
   - url: file:///absolute/path/to/quarto-typst-engine/typst-engine.ts
 ```
 
-**Important**: When using the `file://` domain, the path must be absolute. Project-relative paths are not currently supported with `file://` URLs. This limitation will likely be fixed in the stable release.
+**Important**: When using the `file://` domain, the path must be absolute. Project-relative paths are not currently supported. This limitation will likely be fixed in the stable release.
 
 ## Usage
 
@@ -64,15 +65,16 @@ You can then use Typst syntax directly in your document, as shown in the `column
 
 ## Technical Notes
 
-### The _discovery Flag
+### The \_discovery Flag
 
 This engine implements the new `ExecutionEngineDiscovery` interface with a `_discovery` flag:
 
 ```typescript
-const typstEngineDiscovery: ExecutionEngineDiscovery & { _discovery: boolean } = {
-  _discovery: true,
-  // ...
-};
+const typstEngineDiscovery: ExecutionEngineDiscovery & { _discovery: boolean } =
+  {
+    _discovery: true,
+    // ...
+  };
 ```
 
 This is a temporary flag that indicates the engine supports the new Quarto 1.9 ExecutionEngineDiscovery interface. This flag likely won't be needed when version 1.9 becomes the stable release.
