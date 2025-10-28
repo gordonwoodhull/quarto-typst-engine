@@ -1,2 +1,2 @@
-engines:
-  - url: file:///Users/gordon/src/quarto-typst-engine/typst-engine.ts
+project:
+  type: default

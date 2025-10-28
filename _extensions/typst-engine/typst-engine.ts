@@ -18,7 +18,7 @@ import {
   MappedString,
   EngineProjectContext,
   QuartoAPI
-} from "../quarto-cli/packages/quarto-types/dist/index.js";
+} from "../../../quarto-cli/packages/quarto-types/dist/index.js";
 
 // Import from Deno standard library
 import { extname } from "path";

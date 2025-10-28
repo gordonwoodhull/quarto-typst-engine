@@ -1,6 +1,8 @@
 # Experimental Typst Engine for Quarto
 
-A demonstration of a Quarto external engine that enables using Typst syntax directly in Quarto documents. This project has been updated to use the new `ExecutionEngineDiscovery` interface coming in Quarto 1.9.
+A demonstration of a Quarto engine extension that enables using Typst syntax directly in Quarto documents. This project has been updated to use the new `ExecutionEngineDiscovery` interface coming in Quarto 1.9.
+
+This is just an experiment and not for production use!
 
 ## How it Works
 
@@ -28,26 +30,30 @@ This is primarily an experimental approach with some limitations:
 - Many Quarto features might not be accessible when using Typst syntax
 - The parser might not handle all edge cases correctly
 
+## Installation
+
+This extension can be installed directly from GitHub:
+
+```bash
+quarto install extension gordonwoodhull/quarto-typst-engine
+```
+
+This will install the extension in your project's `_extensions/` directory.
+
 ## Setup
 
-This engine requires Quarto 1.9 (currently in development) with support for external engines.
+This engine requires Quarto 1.9 (currently in development).
 
-1. Ensure the `@quarto/types` package is built:
+For development:
+
+1. Place this directory adjacent to the `quarto-cli` directory, maintaining the relative paths.
+2. Ensure the `@quarto/types` package is built:
 
 ```bash
 cd ../quarto-cli/packages/quarto-types
 npm install
 npm run build
 ````
-
-2. In your Quarto project, add the following to `_quarto.yml`:
-
-```yaml
-engines:
-  - url: file:///absolute/path/to/quarto-typst-engine/typst-engine.ts
-```
-
-**Important**: When using the `file://` domain, the path must be absolute. Project-relative paths are not currently supported. This limitation will likely be fixed in the stable release.
 
 ## Usage
 
@@ -65,6 +71,17 @@ You can then use Typst syntax directly in your document, as shown in the `column
 
 ## Technical Notes
 
+### Extension Structure
+
+The extension is structured as follows:
+
+```
+_extensions/
+  └── typst-engine/
+      ├── _extension.yml      # Extension metadata
+      └── typst-engine.ts     # Engine implementation
+```
+
 ### The \_discovery Flag
 
 This engine implements the new `ExecutionEngineDiscovery` interface with a `_discovery` flag:
@@ -80,5 +97,16 @@ const typstEngineDiscovery: ExecutionEngineDiscovery & { _discovery: boolean } =
 This is a temporary flag that indicates the engine supports the new Quarto 1.9 ExecutionEngineDiscovery interface. This flag likely won't be needed when version 1.9 becomes the stable release.
 
 ### @quarto/types Package
+
+**Important**: This engine imports types from the `@quarto/types` package using a relative path to the built distribution:
+
+```typescript
+import {
+  ExecutionEngineDiscovery,
+  // Other types...
+} from "../../../quarto-cli/packages/quarto-types/dist/index.js";
+```
+
+The `@quarto/types` package must be built before using this engine. See [Setup](#setup).
 
 Note that `@quarto/types` is not yet published as an npm package because its API is still in flux. Using it directly like this is experimental and may break with future Quarto updates. Use at your own risk.
