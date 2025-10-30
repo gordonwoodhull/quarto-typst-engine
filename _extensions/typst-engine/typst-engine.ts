@@ -4,7 +4,7 @@
  * Copyright (C) 2020-2025 Posit Software, PBC
  */
 
-// Import types directly from source
+// Import types from bundled types
 import type {
   DependenciesOptions,
   DependenciesResult,
@@ -15,14 +15,17 @@ import type {
   ExecutionEngineInstance,
   PostProcessOptions,
   MappedString,
-  EngineProjectContext
-} from "../../../quarto-cli/packages/quarto-types/src/index";
+  EngineProjectContext,
+  QuartoAPI,
+} from "./types/quarto-types.d.ts";
 
 // Import from Deno standard library
 import { extname } from "path";
 
 export const kMdExtensions = [".md", ".markdown"];
 export const kQmdExtensions = [".qmd"];
+
+let quarto: QuartoAPI;
 
 
 /**
@@ -175,6 +178,10 @@ const typstEngineDiscovery: ExecutionEngineDiscovery & { _discovery: boolean } =
   // Flag to indicate this is a discovery engine (will be removed in stable 1.9)
   _discovery: true,
 
+  init: (quartoAPI: QuartoAPI) => {
+    quarto = quartoAPI;
+  },
+
   // Basic engine properties
   name: "typst",
   defaultExt: ".qmd",
@@ -203,21 +210,19 @@ const typstEngineDiscovery: ExecutionEngineDiscovery & { _discovery: boolean } =
        * Read file and convert to markdown with source mapping
        */
       markdownForFile(file: string): Promise<MappedString> {
-        return Promise.resolve(context.quarto.mappedString.fromFile(file));
+        return Promise.resolve(quarto.mappedString.fromFile(file));
       },
 
       /**
        * Create an execution target for a file
        */
       target: (file: string, _quiet?: boolean, markdown?: MappedString) => {
-        if (markdown === undefined) {
-          markdown = context.quarto.mappedString.fromFile(file);
-        }
-        const metadata = context.quarto.markdownRegex.extractYaml(markdown.value);
+        const md = markdown ?? quarto.mappedString.fromFile(file);
+        const metadata = quarto.markdownRegex.extractYaml(md.value);
         const target: ExecutionTarget = {
           source: file,
           input: file,
-          markdown,
+          markdown: md,
           metadata,
         };
         return Promise.resolve(target);
@@ -228,7 +233,7 @@ const typstEngineDiscovery: ExecutionEngineDiscovery & { _discovery: boolean } =
        */
       partitionedMarkdown: (file: string) => {
         return Promise.resolve(
-          context.quarto.markdownRegex.partition(Deno.readTextFileSync(file)),
+          quarto.markdownRegex.partition(Deno.readTextFileSync(file)),
         );
       },
 
