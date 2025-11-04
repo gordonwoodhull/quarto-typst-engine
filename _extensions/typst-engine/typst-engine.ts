@@ -246,7 +246,6 @@ const typstEngineDiscovery: ExecutionEngineDiscovery & { _discovery: boolean } =
 
         // Parse the markdown into chunks
         const chunks = chunkQuartoMarkdown(markdown);
-        console.log("Parsed chunks:", chunks);
 
         // if it's plain md, validate that it doesn't have executable cells in it
         if (extname(options.target.input).toLowerCase() === ".md") {
