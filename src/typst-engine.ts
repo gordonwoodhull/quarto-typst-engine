@@ -4,7 +4,7 @@
  * Copyright (C) 2020-2025 Posit Software, PBC
  */
 
-// Import types from bundled types
+// Import types from Quarto via import map
 import type {
   DependenciesOptions,
   DependenciesResult,
@@ -17,10 +17,10 @@ import type {
   MappedString,
   EngineProjectContext,
   QuartoAPI,
-} from "./types/quarto-types.d.ts";
+} from "@quarto/types";
 
 // Import from Deno standard library
-import { extname } from "path";
+import { extname } from "jsr:@std/path@1.0.8";
 
 export const kMdExtensions = [".md", ".markdown"];
 export const kQmdExtensions = [".qmd"];
@@ -172,12 +172,8 @@ function quartoChunksToMarkdown(chunks: QuartoChunk[]): string {
 
 /**
  * Typst engine discovery implementation
- * This uses the new ExecutionEngineDiscovery interface with _discovery flag
  */
-const typstEngineDiscovery: ExecutionEngineDiscovery & { _discovery: boolean } = {
-  // Flag to indicate this is a discovery engine (will be removed in stable 1.9)
-  _discovery: true,
-
+const typstEngineDiscovery: ExecutionEngineDiscovery = {
   init: (quartoAPI: QuartoAPI) => {
     quarto = quartoAPI;
   },

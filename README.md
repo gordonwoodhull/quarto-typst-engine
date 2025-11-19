@@ -40,20 +40,21 @@ quarto install extension gordonwoodhull/quarto-typst-engine
 
 This will install the extension in your project's `_extensions/` directory.
 
-## Setup
+## Development
 
-This engine requires Quarto 1.9 (currently in development).
+This extension is written in TypeScript and requires Quarto 1.9 (currently in development).
 
-For development:
-
-1. Place this directory adjacent to the `quarto-cli` directory, maintaining the relative paths.
-2. Ensure the `@quarto/types` package is built:
+The TypeScript source is in `src/typst-engine.ts`. To build the extension:
 
 ```bash
-cd ../quarto-cli/packages/quarto-types
-npm install
-npm run build
-````
+quarto dev-call build-ts-extension
+```
+
+This will:
+- Type-check the TypeScript code against Quarto's API types
+- Bundle the extension into `_extensions/typst-engine/typst-engine.js`
+
+The built JavaScript file should be committed to version control.
 
 ## Usage
 
@@ -73,40 +74,37 @@ You can then use Typst syntax directly in your document, as shown in the `column
 
 ### Extension Structure
 
-The extension is structured as follows:
+The extension follows the standard Quarto engine extension structure:
 
 ```
-_extensions/
-  └── typst-engine/
-      ├── _extension.yml      # Extension metadata
-      └── typst-engine.ts     # Engine implementation
+├── src/
+│   └── typst-engine.ts         # TypeScript source
+└── _extensions/
+    └── typst-engine/
+        ├── _extension.yml      # Extension metadata
+        └── typst-engine.js     # Built JavaScript (bundled)
 ```
 
-### The \_discovery Flag
+### Type System
 
-This engine implements the new `ExecutionEngineDiscovery` interface with a `_discovery` flag:
+This engine uses Quarto's type definitions via the `@quarto/types` import map:
 
 ```typescript
-const typstEngineDiscovery: ExecutionEngineDiscovery & { _discovery: boolean } =
-  {
-    _discovery: true,
-    // ...
-  };
-```
-
-This is a temporary flag that indicates the engine supports the new Quarto 1.9 ExecutionEngineDiscovery interface. This flag likely won't be needed when version 1.9 becomes the stable release.
-
-### @quarto/types Package
-
-**Important**: This engine imports types from the `@quarto/types` package using a relative path to the built distribution:
-
-```typescript
-import {
+import type {
   ExecutionEngineDiscovery,
+  QuartoAPI,
   // Other types...
-} from "../../../quarto-cli/packages/quarto-types/dist/index.js";
+} from "@quarto/types";
 ```
 
-The `@quarto/types` package must be built before using this engine. See [Setup](#setup).
+The types are provided by Quarto during type-checking and are erased during bundling (type-only imports).
 
-Note that `@quarto/types` is not yet published as an npm package because its API is still in flux. Using it directly like this is experimental and may break with future Quarto updates. Use at your own risk.
+### External Dependencies
+
+External dependencies like Deno standard library modules are imported using full JSR URLs:
+
+```typescript
+import { extname } from "jsr:@std/path@1.0.8";
+```
+
+These imports are marked as external during bundling and resolved by Quarto's Deno runtime at load time.
