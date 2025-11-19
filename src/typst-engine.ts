@@ -20,7 +20,7 @@ import type {
 } from "@quarto/types";
 
 // Import from Deno standard library
-import { extname } from "jsr:@std/path@1.0.8";
+import { extname } from "path";
 
 export const kMdExtensions = [".md", ".markdown"];
 export const kQmdExtensions = [".qmd"];
